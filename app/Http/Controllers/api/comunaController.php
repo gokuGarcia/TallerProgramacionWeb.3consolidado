@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use app\Models\Comuna;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use illuminate\Http\Request;
+use Illuminate\Http\Request;
 
 class comunaController extends Controller
 {
@@ -20,7 +20,7 @@ class comunaController extends Controller
             ->select('tb_comuna.*', "tb_municipio.muni_nomb")
             ->get();
 
-        return json_encode(['comunas'=>$comunas]);
+        return response()-> json(['comunas'=>$comunas], 200, [], JSON_PRETTY_PRINT);
     }
 
     /**
@@ -28,7 +28,20 @@ class comunaController extends Controller
      */
     public function store(Request $request)
     {
-        $comuna = new User();
+
+    /*    $validate = validator($request->all(), [
+            'comu_nomb' => ['required', 'max:30', 'unique'],
+            'muni_codi' => ['required', 'numeric', 'min:1']
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                'mgs' => 'Se produjo un error en la validacion de la información',
+            'statusCode' => 400
+        ]);
+        }*/
+
+        $comuna = new comuna();
         $comuna->comu_nomb = $request->comu_nomb;
         $comuna->muni_codi = $request->muni_codi;
         $comuna->save();
@@ -41,10 +54,13 @@ class comunaController extends Controller
      */
     public function show(string $id)
     {
-         $comuna = User::find($id);
-       if (is_null($comuna)) {
-          return abort(404);
-       }
+         $comuna = comuna::find($id);
+         $municipios = DB::table('tb_municipio')
+            ->orderBy('muni_nomb')
+            ->get();
+
+            return response()->json(['comuna' => $comuna, 'municipios' => $municipios]);
+      
     }
 
     /**
@@ -52,7 +68,20 @@ class comunaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-         $comuna = User::find($id);
+
+         $validate = validator($request->all(), [
+            'comu_nomb' => ['required', 'max:30', 'unique'],
+            'muni_codi' => ['required', 'numeric', 'min:1']
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                'mgs' => 'Se produjo un error en la validacion de la información',
+            'statusCode' => 400
+        ]);
+        }
+
+         $comuna = comuna::find($id);
        if (is_null($comuna)) {
           return abort(404);
        }
@@ -63,7 +92,7 @@ class comunaController extends Controller
      */
     public function destroy(string $id)
     {
-        $comuna = User::find($id);
+        $comuna = comuna::find($id);
        if (is_null($comuna)) {
           return abort(404);
        }
