@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use app\Models\Comuna;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class comunaController extends Controller
      */
     public function store(Request $request)
     {
-        $comuna = new Comuna();
+        $comuna = new User();
         $comuna->comu_nomb = $request->comu_nomb;
         $comuna->muni_codi = $request->muni_codi;
         $comuna->save();
@@ -40,10 +41,10 @@ class comunaController extends Controller
      */
     public function show(string $id)
     {
-        $comuna = comuna::find($id);
-        $municipios = DB::table('tb_municipio')
-            ->orderBy('muni_nomb')
-            ->get();
+         $comuna = User::find($id);
+       if (is_null($comuna)) {
+          return abort(404);
+       }
     }
 
     /**
@@ -51,12 +52,10 @@ class comunaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $comuna = Comuna::find($id);
-        $comuna->comu_nomb = $request->comu_nomb;
-        $comuna->muni_codi = $request->muni_codi;
-        $comuna->save();
-
-        return json_encode(['comuna'=>$comuna]);
+         $comuna = User::find($id);
+       if (is_null($comuna)) {
+          return abort(404);
+       }
     }
 
     /**
@@ -64,12 +63,9 @@ class comunaController extends Controller
      */
     public function destroy(string $id)
     {
-        $comuna = Comuna::find($id);
-        $comuna->delete();
-        $comunas = DB::table('tb_comuna')
-            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
-            ->select('tb_comuna.*', "tb_municipio.muni_nomb")
-            ->get();
-        return json_encode(['comunas'=>$comunas, 'success'=> true]);
+        $comuna = User::find($id);
+       if (is_null($comuna)) {
+          return abort(404);
+       }
     }
 }
