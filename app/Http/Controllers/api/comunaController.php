@@ -69,7 +69,7 @@ class comunaController extends Controller
     public function update(Request $request, string $id)
     {
 
-         $validate = validator($request->all(), [
+      /*   $validate = validator($request->all(), [
             'comu_nomb' => ['required', 'max:30', 'unique'],
             'muni_codi' => ['required', 'numeric', 'min:1']
         ]);
@@ -79,12 +79,14 @@ class comunaController extends Controller
                 'mgs' => 'Se produjo un error en la validacion de la información',
             'statusCode' => 400
         ]);
-        }
+        }*/
 
          $comuna = comuna::find($id);
-       if (is_null($comuna)) {
-          return abort(404);
-       }
+         $comuna->comu_nomb = $request->comu_nomb;
+         $comuna->muni_codi = $request->muni_codi;
+         $comuna->save();
+         return json_encode(['comuna'=>$comuna]);
+       
     }
 
     /**
@@ -93,8 +95,12 @@ class comunaController extends Controller
     public function destroy(string $id)
     {
         $comuna = comuna::find($id);
-       if (is_null($comuna)) {
-          return abort(404);
-       }
+        $comuna->delete();
+        $comunas = DB::table('tb_comuna')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_comuna.*', "tb_municipio.muni_nomb")
+            ->get();
+        return json_encode(['comunas'=>$comunas, 'seccess'=> true]);
+      
     }
 }
