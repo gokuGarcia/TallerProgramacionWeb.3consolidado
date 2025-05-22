@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\api;
 
+use Illuminate\Support\Facades\DB;
+use App\Models\municipio;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -12,7 +14,11 @@ class municipioControler extends Controller
      */
     public function index()
     {
-        //
+        $municipios = DB::table('tb_municipio')
+            ->orderBy('muni_nomb')
+            ->get();
+
+        return json_encode(['municipios' => $municipios]);
     }
 
     /**
